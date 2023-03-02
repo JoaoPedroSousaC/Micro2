@@ -31,10 +31,10 @@ endif
 all: projeto.elf
 
 # Tool invocations
-projeto.elf: $(OBJS) $(USER_OBJS) D:\Users\201911250018\projeto/LinkerScript.ld
+projeto.elf: $(OBJS) $(USER_OBJS) C:\Users\gamer\OneDrive\Documents\Micro2/LinkerScript.ld
 	@echo 'Building target: $@'
 	@echo 'Invoking: MCU GCC Linker'
-	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -T"D:/Users/201911250018/projeto/LinkerScript.ld" -Wl,-Map=output.map -Wl,--gc-sections -o "projeto.elf" @"objects.list" $(USER_OBJS) $(LIBS) -lm
+	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -T"C:/Users/gamer/OneDrive/Documents/Micro2/LinkerScript.ld" -Wl,-Map=output.map -Wl,--gc-sections -o "projeto.elf" @"objects.list" $(USER_OBJS) $(LIBS) -lm
 	@echo 'Finished building target: $@'
 	@echo ' '
 	$(MAKE) --no-print-directory post-build
