@@ -73,8 +73,7 @@ void envia_cmd(uint8_t dado)
 		GPIOA->ODR &= ~1;
 	Delay_us(10);			//aguarda o tempo do bit
 	GPIOA->ODR |= 1;		//stop bit
-	Delay_us(10);			//tempo do stop bit
-	Delay_us(200);
+	Delay_us(5);
 	if((GPIOA->IDR & 1))	//verifica se ñ houve start bit comunica��o
 	{
 		if (dado & 1)
@@ -87,6 +86,9 @@ void envia_cmd(uint8_t dado)
 		}
 
 	}
+	Delay_us(5);
+	GPIOA->ODR |= 1;
+	Delay_us(10);
 }
 
 //Fun��o para recebimento de um comando
@@ -101,15 +103,15 @@ uint8_t recebe_cmd(void)
 			dado_recebido = 1;
 		else
 			dado_recebido = 0;
-
+		Delay_us(5);
+		GPIOA->ODR &= ~1;
 		Delay_us(10);			//aguarda para fazer leitura do stop bit
+		GPIOA->ODR |= 1;
+
+		Delay_us(10);
 		if((GPIOA->IDR & 1))	//confirma que houve um stop bit
 		{
 			Delay_us(5);			//aguarda o fim do tempo do stop bit
-			Delay_us(195);
-			GPIOA->ODR &= ~1;
-			Delay_us(5);
-			GPIOA->ODR |= 1;
 			return dado_recebido;	//retorna o dado recebido
 		}
 		else
