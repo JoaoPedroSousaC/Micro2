@@ -21,10 +21,10 @@ int main(void)
 
 	RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN | RCC_AHB1ENR_GPIOEEN;	//habilita o clock do GPIOA e GPIOE
 
-	GPIOA->ODR |= (1<<7) | (1<<6) | 1;		//inicia com leds e buzzer desligados e linha COM em idle
-	GPIOA->OTYPER |= 1;						//sa�da open-drain em PA0
-	GPIOA->PUPDR |= 0b01;					//habilita pull-up em PA0
-	GPIOA->MODER |= (0b01 << 14) | (0b01 << 12) | (0b01 << 2) | (0b01) ; 	//pinos PA0, PA1, PA6 e PA7 no modo sa�da
+	GPIOA->ODR |= (1<<7) | (1<<6) | (1 << 2);		//inicia com leds e buzzer desligados e linha COM em idle
+	GPIOA->OTYPER |= (1 << 2);						//sa�da open-drain em PA0
+	GPIOA->PUPDR |= (0b01 << 4);					//habilita pull-up em PA0
+	GPIOA->MODER |= (0b01 << 14) | (0b01 << 12) | (0b01 << 2) | (0b01 << 4) ; 	//pinos PA0, PA1, PA6 e PA7 no modo sa�da
 	GPIOE->PUPDR |= (0b01 << 8) | (0b01 << 6);								//habilita pull-up em PE4 e PE3
 
 	Delay_ms(100);	//aguarda sinais estabilizarem
@@ -47,7 +47,7 @@ int main(void)
 			while(!(GPIOE->IDR & (1 << 3)));	//aguarda o bot�o ser solto
 		}
 
-		if(!(GPIOA->IDR & 1))	//verifica se houve start bit comunica��o
+		if(!(GPIOA->IDR & (1 << 2)))	//verifica se houve start bit comunica��o
 		{
 			uint8_t recebido = recebe_cmd();	//recebe o comando
 			if(recebido == 0)
@@ -65,16 +65,16 @@ int main(void)
 //Fun��o para envio de um comando
 void envia_cmd(uint8_t dado)
 {
-	GPIOA->ODR &= ~1;	//start bit
+	GPIOA->ODR &= ~(1<<2);	//start bit
 	Delay_us(10);		//aguarda tempo do start bit
 	if(dado & 1)		//envia o bit do comando
-		GPIOA->ODR |= 1;
+		GPIOA->ODR |= (1<<2);
 	else
-		GPIOA->ODR &= ~1;
+		GPIOA->ODR &= ~(1<<2);
 	Delay_us(10);			//aguarda o tempo do bit
-	GPIOA->ODR |= 1;		//stop bit
+	GPIOA->ODR |= (1<<2);		//stop bit
 	Delay_us(5);
-	if((GPIOA->IDR & 1))	//verifica se ñ houve start bit comunica��o
+	if((GPIOA->IDR & (1<<2)))	//verifica se ñ houve start bit comunica��o
 	{
 		if (dado & 1)
 		{
@@ -87,7 +87,7 @@ void envia_cmd(uint8_t dado)
 
 	}
 	Delay_us(5);
-	GPIOA->ODR |= 1;
+	GPIOA->ODR |= (1<<2);
 	Delay_us(10);
 }
 
@@ -96,20 +96,20 @@ uint8_t recebe_cmd(void)
 {
 	uint8_t dado_recebido;
 	Delay_us(5);			//aguarda metade do start bit
-	if(!(GPIOA->IDR & 1))	//confirma que houve um start bit
+	if(!(GPIOA->IDR & (1<<2)))	//confirma que houve um start bit
 	{
 		Delay_us(10);		//aguarda o tempo do bit
-		if(GPIOA->IDR & 1)
+		if(GPIOA->IDR & (1<<2))
 			dado_recebido = 1;
 		else
 			dado_recebido = 0;
 		Delay_us(5);
-		GPIOA->ODR &= ~1;
+		GPIOA->ODR &= ~(1<<2);
 		Delay_us(10);			//aguarda para fazer leitura do stop bit
-		GPIOA->ODR |= 1;
+		GPIOA->ODR |= (1<<2);
 
 		Delay_us(10);
-		if((GPIOA->IDR & 1))	//confirma que houve um stop bit
+		if((GPIOA->IDR & (1<<2)))	//confirma que houve um stop bit
 		{
 			Delay_us(5);			//aguarda o fim do tempo do stop bit
 			return dado_recebido;	//retorna o dado recebido
